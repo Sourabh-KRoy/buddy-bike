@@ -1,10 +1,20 @@
+import { jwtDecode } from "jwt-decode";
 import { Navigate, Outlet } from "react-router-dom";
-import { isTokenValid } from "./authUtils";
 
 const ProtectedRoute = () => {
-  if (!isTokenValid()) {
-    return <Navigate to="/login" replace />;
+  const token = localStorage.getItem("token");
+
+  if (!token) return <Navigate to="/login" />;
+
+  const decoded: any = jwtDecode(token);
+
+  // Optional: Restrict admin route
+  const isAdminRoute = window.location.pathname.startsWith("/admin");
+
+  if (isAdminRoute && decoded.role !== "admin") {
+    return <Navigate to="/" />;
   }
+
   return <Outlet />;
 };
 

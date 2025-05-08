@@ -1,13 +1,12 @@
-export const login = async (email: string, password: string) => {
+import { api_url } from "./api-url";
+
+export const login = async (username: string, password: string) => {
   try {
-    const response = await fetch(
-      "https://gateway.fm.apps.workeye.in/us/v1/api/authKeyClock/getToken",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }), // Using email and password in the request body
-      }
-    );
+    const response = await fetch(`${api_url}/api/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }), // Using email and password in the request body
+    });
 
     if (!response.ok) {
       throw new Error("Login failed. Server returned an error.");
@@ -20,9 +19,9 @@ export const login = async (email: string, password: string) => {
 
     const data = JSON.parse(textResponse); // Now parse the text response
 
-    if (data?.access_token) {
+    if (data?.token) {
       // Save the token to localStorage
-      localStorage.setItem("access_token", data.access_token);
+      localStorage.setItem("token", data.token);
       return data; // Return the data if access_token is found
     } else {
       throw new Error("Access token not found in response");

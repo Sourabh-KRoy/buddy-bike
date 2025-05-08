@@ -1,21 +1,33 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { login } from "../services/all-services"; // Assuming your login function is in this file
+import { login } from "../services/all-services";
+import { jwtDecode } from "jwt-decode";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      const loginData = await login(email, password); // Call the login function
+      const loginData = await login(username, password);
+      console.log("Login response:", loginData);
 
-      if (loginData?.access_token) {
-        console.log("Logged in successfully! Token saved.");
-        navigate("/"); // Navigate to home page after successful login
+      if (loginData?.token) {
+        localStorage.setItem("token", loginData.token);
+        const decoded: any = jwtDecode(loginData.token);
+
+        if (decoded.role === "admin") {
+          navigate("/admin");
+        } else if (decoded.role === "user") {
+          navigate("/");
+        } else {
+          alert("Unknown role!");
+        }
       }
     } catch (error) {
       alert("Login failed! Please check your credentials.");
@@ -29,34 +41,40 @@ const LoginPage = () => {
           Login
         </h2>
         <form onSubmit={handleLogin} className="space-y-4">
-          <div>
+          <input
+            type="text"
+            placeholder="Username"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
+
+          <div className="relative">
             <input
-              type="email"
-              placeholder="Email"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="Password"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
-          </div>
-          <div className="flex justify-between items-center mt-4">
             <button
-              type="submit"
-              className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300"
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-600 hover:text-gray-800 focus:outline-none"
             >
-              Login
+              {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
             </button>
           </div>
+
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300"
+          >
+            Login
+          </button>
+
           <div className="mt-4 text-center">
             <p className="text-gray-600">
               Don't have an account?{" "}

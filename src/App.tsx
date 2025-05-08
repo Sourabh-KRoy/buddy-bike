@@ -7,6 +7,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import AboutUs from "./components/AboutUs";
 import ContactUs from "./components/ContactUs";
 import ConfirmationPage from "./pages/ConfirmationPage";
+import AdminDashboard from "./pages/admin-dashboard/AdminDasboard";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="/about" element={<AboutUs />} />
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/booking-status" element={<ConfirmationPage />} />
+          <Route path="/admin" element={<AdminDashboard />} />
         </Route>
       </Routes>
     </>
