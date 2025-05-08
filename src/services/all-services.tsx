@@ -31,3 +31,23 @@ export const login = async (username: string, password: string) => {
     throw new Error("Login failed");
   }
 };
+
+export const signup = async (username: string, password: string) => {
+  try {
+    const response = await fetch(`${api_url}/api/auth/signup`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Signup failed. Server returned an error.");
+    }
+
+    const data = await response.json(); // Expecting: { message: "User created" }
+    return data;
+  } catch (error) {
+    console.error("Error during signup:", error);
+    throw new Error("Signup failed");
+  }
+};
