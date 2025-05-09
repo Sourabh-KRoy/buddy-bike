@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 const Navbar = () => {
   const handleLogout = () => {
     // Logic to clear token or session on logout
-    localStorage.removeItem("token"); // Remove the token from localStorage
+    localStorage.removeItem("access_token"); // Remove the token from localStorage
     window.location.href = "/login"; // Redirect to login page after logout
   };
 
@@ -60,28 +60,14 @@ const Navbar = () => {
             </NavLink>
           </li>
 
-          {/* Conditionally Render Logout if Token Exists */}
-          {localStorage.getItem("token") ? (
-            <li className="mt-2">
-              <button
-                onClick={handleLogout}
-                className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
-              >
-                Logout
-              </button>
-            </li>
-          ) : (
-            <>
-              <li className="mt-2">
-                <button
-                  onClick={handleLogout}
-                  className="bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
-                >
-                  Login
-                </button>
-              </li>
-            </>
-          )}
+          <li className="mt-2">
+            <button
+              onClick={handleLogout}
+              className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
+            >
+              Logout
+            </button>
+          </li>
         </ul>
       </div>
     </nav>

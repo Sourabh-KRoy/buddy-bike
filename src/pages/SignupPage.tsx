@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { signup } from "../services/all-services"; // adjust path as needed
+import { signup } from "../services/all-services";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 
 const SignupPage: React.FC = () => {
-  const [username, setUsername] = useState(""); // use username instead of email
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const navigate = useNavigate();
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -16,9 +19,9 @@ const SignupPage: React.FC = () => {
     }
 
     try {
-      const res = await signup(username, password);
-      alert(res.message); // Show: "User created"
-      navigate("/login"); // Redirect to login
+      await signup(email, password);
+      alert("User created");
+      navigate("/login");
     } catch (err) {
       alert("Signup failed. Please try again.");
     }
@@ -36,30 +39,48 @@ const SignupPage: React.FC = () => {
 
         <input
           type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          placeholder="Enter your email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           required
           className="w-full mb-4 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          className="w-full mb-4 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+        {/* Password Field */}
+        <div className="relative mb-4">
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <span
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute top-3 right-4 text-gray-500 cursor-pointer text-xl"
+          >
+            {showPassword ? <FiEyeOff /> : <FiEye />}
+          </span>
+        </div>
 
-        <input
-          type="password"
-          placeholder="Confirm Password"
-          value={confirm}
-          onChange={(e) => setConfirm(e.target.value)}
-          required
-          className="w-full mb-6 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+        {/* Confirm Password Field */}
+        <div className="relative mb-6">
+          <input
+            type={showConfirm ? "text" : "password"}
+            placeholder="Confirm Password"
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+            required
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <span
+            onClick={() => setShowConfirm(!showConfirm)}
+            className="absolute top-3 right-4 text-gray-500 cursor-pointer text-xl"
+          >
+            {showConfirm ? <FiEyeOff /> : <FiEye />}
+          </span>
+        </div>
 
         <button
           type="submit"

@@ -6,7 +6,7 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
@@ -14,23 +14,24 @@ const LoginPage = () => {
     e.preventDefault();
 
     try {
-      const loginData = await login(username, password);
+      const loginData = await login(email, password);
       console.log("Login response:", loginData);
 
-      if (loginData?.token) {
-        localStorage.setItem("token", loginData.token);
-        const decoded: any = jwtDecode(loginData.token);
-
-        if (decoded.role === "admin") {
+      if (loginData?.access_token) {
+        localStorage.setItem("access_token", loginData.access_token);
+        const decoded: any = jwtDecode(loginData.access_token);
+        // Store the userId in localStorage
+        localStorage.setItem("userId", decoded.sub);
+        if (decoded.role === "Admin") {
           navigate("/admin");
-        } else if (decoded.role === "user") {
+        } else if (decoded.role === "User") {
           navigate("/");
         } else {
           alert("Unknown role!");
         }
       }
     } catch (error) {
-      alert("Login failed! Please check your credentials.");
+      alert("Login failed! Please check your email and password.");
     }
   };
 
@@ -42,11 +43,11 @@ const LoginPage = () => {
         </h2>
         <form onSubmit={handleLogin} className="space-y-4">
           <input
-            type="text"
-            placeholder="Username"
+            type="email"
+            placeholder="Email"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
 

@@ -1,37 +1,40 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import BikeCard from "../components/BikeCard";
 import BookingForm from "../components/BookingForm";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { createBooking, getBike } from "../services/all-services";
 
 type Bike = {
-  id: number;
+  id: string;
   name: string;
-  description: string;
-  imageUrl: string;
+  engine: string;
+  version: string;
+  brakes: string;
+  comfort: string;
+  costPerDay: number;
+  image: string;
 };
-
-const bikes: Bike[] = [
-  {
-    id: 1,
-    name: "Mountain Bike",
-    description: "Perfect for off-road and adventure trails.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1449426468159-d96dbf08f19f?fm=jpg&q=60&w=3000",
-  },
-  {
-    id: 2,
-    name: "City Bike",
-    description: "Great for daily urban commuting.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1449426468159-d96dbf08f19f?fm=jpg&q=60&w=3000",
-  },
-  // ...more bikes
-];
 
 const HomePage: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedBike, setSelectedBike] = useState<Bike | null>(null);
+  const [bikes, setBikes] = useState<Bike[]>([]);
+
+  // Fetch bikes from the backend
+  useEffect(() => {
+    const fetchBikes = async () => {
+      try {
+        const data = await getBike();
+        setBikes(data);
+        console.log("Fetched bikes:", data);
+      } catch (error) {
+        console.error("Error fetching bikes:", error);
+      }
+    };
+
+    fetchBikes();
+  }, []);
 
   const handleSelectBike = (bike: Bike) => {
     setSelectedBike(bike);
@@ -41,6 +44,32 @@ const HomePage: React.FC = () => {
   const closeModal = () => {
     setShowModal(false);
     setSelectedBike(null);
+  };
+
+  const handleBooking = async (
+    startDate: string,
+    endDate: string,
+    name: string
+  ) => {
+    if (!selectedBike) return;
+
+    const payload = {
+      userId: localStorage.getItem("userId"), // Replace with actual user ID
+      bikeId: selectedBike.id,
+      startDate: new Date(startDate).toISOString(),
+      endDate: new Date(endDate).toISOString(),
+      name: name,
+    };
+
+    try {
+      const bookingResponse = await createBooking(payload);
+      console.log("Booking Successful:", bookingResponse);
+      // Handle success (e.g., show a confirmation message)
+      closeModal();
+    } catch (error) {
+      console.error("Error creating booking:", error);
+      // Handle error (e.g., show an error message)
+    }
   };
 
   return (
@@ -53,8 +82,12 @@ const HomePage: React.FC = () => {
             <BikeCard
               key={bike.id}
               name={bike.name}
-              description={bike.description}
-              imageUrl={bike.imageUrl}
+              engine={bike.engine}
+              version={bike.version}
+              brakes={bike.brakes}
+              comfort={bike.comfort}
+              costPerDay={bike.costPerDay}
+              image={bike.image}
               onSelect={() => handleSelectBike(bike)}
             />
           ))}
@@ -77,11 +110,13 @@ const HomePage: React.FC = () => {
               Booking: {selectedBike.name}
             </h2>
             <img
-              src={selectedBike.imageUrl}
+              src={selectedBike.image}
               alt={selectedBike.name}
               className="w-full h-40 object-cover rounded mb-4"
             />
-            <BookingForm />
+            <BookingForm
+              onSubmit={handleBooking} // Pass the handleBooking function as a prop
+            />
           </div>
         </div>
       )}

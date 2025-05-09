@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 
 const AdminNavbar = () => {
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem("access_token");
     window.location.href = "/login";
   };
 
